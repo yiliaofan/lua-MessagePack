@@ -1013,16 +1013,42 @@ unpackers['ext32'] = function (c)
 end
 
 
-function m.unpack (s)
-    checktype('unpack', 1, s, 'string')
-    local cursor = {
-        s = s,
+local function cursor_string (str)
+    return {
+        s = str,
         i = 1,
-        j = #s,
+        j = #str,
         underflow = function (self)
                         error "missing bytes"
                     end,
     }
+end
+
+local function cursor_loader (ld)
+    return {
+        s = '',
+        i = 1,
+        j = 0,
+        underflow = function (self, e)
+                        self.s = self.s:sub(self.i)
+                        e = e - self.i + 1
+                        self.i = 1
+                        self.j = 0
+                        while e > self.j do
+                            local chunk = ld()
+                            if not chunk then
+                                error "missing bytes"
+                            end
+                            self.s = self.s .. chunk
+                            self.j = #self.s
+                        end
+                    end,
+    }
+end
+
+function m.unpack (s)
+    checktype('unpack', 1, s, 'string')
+    local cursor = cursor_string(s)
     local data = unpackers['any'](cursor)
     if cursor.i < cursor.j then
         error "extra bytes"
@@ -1032,39 +1058,14 @@ end
 
 function m.unpacker (src)
     if type(src) == 'string' then
-        local cursor = {
-            s = src,
-            i = 1,
-            j = #src,
-            underflow = function (self)
-                            error "missing bytes"
-                        end,
-        }
+        local cursor = cursor_string(src)
         return function ()
             if cursor.i <= cursor.j then
                 return cursor.i, unpackers['any'](cursor)
             end
         end
     elseif type(src) == 'function' then
-        local cursor = {
-            s = '',
-            i = 1,
-            j = 0,
-            underflow = function (self, e)
-                            self.s = self.s:sub(self.i)
-                            e = e - self.i + 1
-                            self.i = 1
-                            self.j = 0
-                            while e > self.j do
-                                local chunk = src()
-                                if not chunk then
-                                    error "missing bytes"
-                                end
-                                self.s = self.s .. chunk
-                                self.j = #self.s
-                            end
-                        end,
-        }
+        local cursor = cursor_loader(src)
         return function ()
             if cursor.i > cursor.j then
                 pcall(cursor.underflow, cursor, cursor.i)
