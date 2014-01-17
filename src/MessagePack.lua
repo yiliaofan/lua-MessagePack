@@ -241,6 +241,14 @@ local set_array = function (array)
                 return packers['array'](buffer, tbl, max)
             end
         end
+    elseif array == 'always_as_map' then
+        packers['_table'] = function(buffer, tbl)
+            local n = 0
+            for k in pairs(tbl) do
+                n = n + 1
+            end
+            return packers['map'](buffer, tbl, n)
+        end
     else
         argerror('set_array', 1, "invalid option '" .. array .."'")
     end

@@ -2,7 +2,7 @@
 
 require 'Test.More'
 
-plan(24)
+plan(29)
 
 local mp = require 'MessagePack'
 
@@ -35,6 +35,17 @@ is_deeply( mp.unpack(mp.pack(t)), t )
 mp.set_array'with_hole'
 is( mp.pack(t):byte(), 0x90 + 4, "array with hole as array" )
 is_deeply( mp.unpack(mp.pack(t)), t )
+mp.set_array'always_as_map'
+is( mp.pack(t):byte(), 0x80 + 3, "always_as_map" )
+is_deeply( mp.unpack(mp.pack(t)), t )
+
+local t = {}
+mp.set_array'without_hole'
+is( mp.pack(t):byte(), 0x90, "empty table as array" )
+mp.set_array'with_hole'
+is( mp.pack(t):byte(), 0x90, "empty table as array" )
+mp.set_array'always_as_map'
+is( mp.pack(t):byte(), 0x80, "empty table as map" )
 
 mp.set_number'float'
 is( mp.pack(3.402824e+38), mp.pack(1/0), "float 3.402824e+38")

@@ -1,5 +1,8 @@
 Revision history for lua-MessagePack
 
+0.3.1
+	add option set_array'always_as_map'
+
 0.3.0  Sun Sep  1 15:30:00 2013
 	compliant with specifications v5
 
