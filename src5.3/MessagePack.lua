@@ -15,7 +15,8 @@ local setmetatable = setmetatable
 local tostring = tostring
 local type = type
 local char = require'string'.char
-local isfloat = require'math'.isfloat
+local math_type = require'math'.type
+local isfloat = require'math'.isfloat or function (n) return math_type(n) == 'float' end
 local frexp = require'math'.frexp
 local ldexp = require'math'.ldexp
 local huge = require'math'.huge
