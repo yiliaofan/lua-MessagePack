@@ -53,8 +53,8 @@ is( mp.pack(7e42), mp.pack(1/0), "inf (downcast double -> float)")
 is( mp.pack(-7e42), mp.pack(-1/0), "-inf (downcast double -> float)")
 is( mp.unpack(mp.pack(7e42)), 1/0, "inf (downcast double -> float)")
 is( mp.unpack(mp.pack(-7e42)), -1/0, "-inf (downcast double -> float)")
-is( mp.unpack(mp.pack(7e-42)), 0, "epsilon (downcast double -> float)")
-is( mp.unpack(mp.pack(-7e-42)), -0, "-epsilon (downcast double -> float)")
+is( mp.unpack(mp.pack(7e-46)), 0, "epsilon (downcast double -> float)")
+is( mp.unpack(mp.pack(-7e-46)), -0, "-epsilon (downcast double -> float)")
 
 local buffer = {}
 mp.packers.float(buffer, 0)

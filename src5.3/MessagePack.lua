@@ -20,6 +20,8 @@ local frexp = require'math'.frexp
 local ldexp = require'math'.ldexp
 local huge = require'math'.huge
 local tconcat = require'table'.concat
+local packfloat = require'string'.packfloat
+local unpackfloat = require'string'.unpackfloat
 
 --[[ debug only
 local format = require'string'.format
@@ -377,71 +379,13 @@ end
 m.set_integer = set_integer
 
 packers['float'] = function (buffer, n)
-    local sign = 0
-    if n < 0.0 then
-        sign = 0x80
-        n = -n
-    end
-    local mant, expo = frexp(n)
-    if mant ~= mant then
-        buffer[#buffer+1] = char(0xCA,  -- nan
-                                 0xFF, 0x88, 0x00, 0x00)
-    elseif mant == huge or expo > 0x80 then
-        if sign == 0 then
-            buffer[#buffer+1] = char(0xCA,      -- inf
-                                     0x7F, 0x80, 0x00, 0x00)
-        else
-            buffer[#buffer+1] = char(0xCA,      -- -inf
-                                     0xFF, 0x80, 0x00, 0x00)
-        end
-    elseif (mant == 0.0 and expo == 0) or expo < -0x7E then
-        buffer[#buffer+1] = char(0xCA,  -- zero
-                                 sign, 0x00, 0x00, 0x00)
-    else
-        expo = expo + 0x7E
-        mant = (mant * 2.0 - 1.0) * ldexp(0.5, 24)
-        buffer[#buffer+1] = char(0xCA,
-                                 sign + (expo >> 1),
-                                 (expo & 0x1) * 0x80 + (mant >> 16),
-                                 (mant >> 8) & 0xFF,
-                                 mant & 0xFF)
-    end
+    buffer[#buffer+1] = char(0xCA)
+    buffer[#buffer+1] = packfloat(n, 'f', 'b')
 end
 
 packers['double'] = function (buffer, n)
-    local sign = 0
-    if n < 0.0 then
-        sign = 0x80
-        n = -n
-    end
-    local mant, expo = frexp(n)
-    if mant ~= mant then
-        buffer[#buffer+1] = char(0xCB,  -- nan
-                                 0xFF, 0xF8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
-    elseif mant == huge then
-        if sign == 0 then
-            buffer[#buffer+1] = char(0xCB,      -- inf
-                                     0x7F, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
-        else
-            buffer[#buffer+1] = char(0xCB,      -- -inf
-                                     0xFF, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
-        end
-    elseif mant == 0.0 and expo == 0 then
-        buffer[#buffer+1] = char(0xCB,  -- zero
-                                 sign, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
-    else
-        expo = expo + 0x3FE
-        mant = (mant * 2.0 - 1.0) * ldexp(0.5, 53)
-        buffer[#buffer+1] = char(0xCB,
-                                 sign + (expo >> 4),
-                                 (expo & 0xF) * 0x10 + (mant >> 48),
-                                 (mant >> 40) & 0xFF,
-                                 (mant >> 32) & 0xFF,
-                                 (mant >> 24) & 0xFF,
-                                 (mant >> 16) & 0xFF,
-                                 (mant >> 8) & 0xFF,
-                                 mant & 0xFF)
-    end
+    buffer[#buffer+1] = char(0xCB)
+    buffer[#buffer+1] = packfloat(n, 'd', 'b')
 end
 
 local set_number = function (number)
@@ -615,29 +559,8 @@ unpackers['float'] = function (c)
         c:underflow(i+3)
         s, i, j = c.s, c.i, c.j
     end
-    local b1, b2, b3, b4 = s:sub(i, i+3):byte(1, 4)
-    local sign = b1 > 0x7F
-    local expo = (b1 & 0x7F) * 0x2 + (b2 >> 7)
-    local mant = ((b2 & 0x7F) * 0x100 + b3) * 0x100 + b4
-    if sign then
-        sign = -1
-    else
-        sign = 1
-    end
-    local n
-    if mant == 0 and expo == 0 then
-        n = sign * 0.0
-    elseif expo == 0xFF then
-        if mant == 0 then
-            n = sign * huge
-        else
-            n = 0.0/0.0
-        end
-    else
-        n = sign * ldexp(1.0 + mant / 0x800000, expo - 0x7F)
-    end
     c.i = i+4
-    return n
+    return unpackfloat(s, i, 'f', 'b')
 end
 
 unpackers['double'] = function (c)
@@ -646,29 +569,8 @@ unpackers['double'] = function (c)
         c:underflow(i+7)
         s, i, j = c.s, c.i, c.j
     end
-    local b1, b2, b3, b4, b5, b6, b7, b8 = s:sub(i, i+7):byte(1, 8)
-    local sign = b1 > 0x7F
-    local expo = (b1 & 0x7F) * 0x10 + (b2 >> 4)
-    local mant = ((((((b2 & 0xF) * 0x100 + b3) * 0x100 + b4) * 0x100 + b5) * 0x100 + b6) * 0x100 + b7) * 0x100 + b8
-    if sign then
-        sign = -1
-    else
-        sign = 1
-    end
-    local n
-    if mant == 0 and expo == 0 then
-        n = sign * 0.0
-    elseif expo == 0x7FF then
-        if mant == 0 then
-            n = sign * huge
-        else
-            n = 0.0/0.0
-        end
-    else
-        n = sign * ldexp(1.0 + mant / 0x10000000000000, expo - 0x3FF)
-    end
     c.i = i+8
-    return n
+    return unpackfloat(s, i, 'd', 'b')
 end
 
 unpackers['fixnum_pos'] = function (c, val)
