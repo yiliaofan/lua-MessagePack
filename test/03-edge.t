@@ -2,7 +2,7 @@
 
 require 'Test.More'
 
-plan(29)
+plan(32)
 
 local mp = require 'MessagePack'
 
@@ -55,6 +55,11 @@ is( mp.unpack(mp.pack(7e42)), 1/0, "inf (downcast double -> float)")
 is( mp.unpack(mp.pack(-7e42)), -1/0, "-inf (downcast double -> float)")
 is( mp.unpack(mp.pack(7e-46)), 0, "epsilon (downcast double -> float)")
 is( mp.unpack(mp.pack(-7e-46)), -0, "-epsilon (downcast double -> float)")
+
+mp.set_integer'unsigned'
+is( mp.unpack(mp.pack(0xF0)), 0xF0, "packint 0xF0")
+is( mp.unpack(mp.pack(0xF000)), 0xF000, "packint 0xF000")
+is( mp.unpack(mp.pack(0xF0000000)), 0xF0000000, "packint 0xF0000000")
 
 local buffer = {}
 mp.packers.float(buffer, 0)
