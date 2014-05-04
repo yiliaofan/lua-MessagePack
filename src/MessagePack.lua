@@ -801,6 +801,7 @@ unpackers['fixstr'] = function (c, val)
     if e > j then
         c:underflow(e)
         s, i, j = c.s, c.i, c.j
+        e = i+n-1
     end
     c.i = i+n
     return s:sub(i, e)
@@ -819,6 +820,7 @@ unpackers['str8'] = function (c)
     if e > j then
         c:underflow(e)
         s, i, j = c.s, c.i, c.j
+        e = i+n-1
     end
     c.i = i+n
     return s:sub(i, e)
@@ -838,6 +840,7 @@ unpackers['str16'] = function (c)
     if e > j then
         c:underflow(e)
         s, i, j = c.s, c.i, c.j
+        e = i+n-1
     end
     c.i = i+n
     return s:sub(i, e)
@@ -857,6 +860,7 @@ unpackers['str32'] = function (c)
     if e > j then
         c:underflow(e)
         s, i, j = c.s, c.i, c.j
+        e = i+n-1
     end
     c.i = i+n
     return s:sub(i, e)
@@ -937,6 +941,7 @@ for k = 0, 4 do
         if e > j then
             c:underflow(e)
             s, i, j = c.s, c.i, c.j
+            e = i+n-1
         end
         c.i = i+n
         return m.build_ext(tag < 0x80 and tag or tag - 0x100, s:sub(i, e))
@@ -963,6 +968,7 @@ unpackers['ext8'] = function (c)
     if e > j then
         c:underflow(e)
         s, i, j = c.s, c.i, c.j
+        e = i+n-1
     end
     c.i = i+n
     return m.build_ext(tag < 0x80 and tag or tag - 0x100, s:sub(i, e))
@@ -989,6 +995,7 @@ unpackers['ext16'] = function (c)
     if e > j then
         c:underflow(e)
         s, i, j = c.s, c.i, c.j
+        e = i+n-1
     end
     c.i = i+n
     return m.build_ext(tag < 0x80 and tag or tag - 0x100, s:sub(i, e))
@@ -1015,6 +1022,7 @@ unpackers['ext32'] = function (c)
     if e > j then
         c:underflow(e)
         s, i, j = c.s, c.i, c.j
+        e = i+n-1
     end
     c.i = i+n
     return m.build_ext(tag < 0x80 and tag or tag - 0x100, s:sub(i, e))
