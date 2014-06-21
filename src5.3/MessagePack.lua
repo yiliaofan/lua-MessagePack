@@ -350,8 +350,8 @@ m.set_number = set_number
 for k = 0, 4 do
     local n = 2^k
     local fixext = 0xD4 + k
-    packers['fixext' .. n] = function (buffer, tag, data)
-        assert(#data == n, "bad length for fixext" .. n)
+    packers['fixext' .. tostring(n)] = function (buffer, tag, data)
+        assert(#data == n, "bad length for fixext" .. tostring(n))
         buffer[#buffer+1] = char(fixext)
         buffer[#buffer+1] = packint(tag, 1, 'b')
         buffer[#buffer+1] = data
@@ -431,7 +431,7 @@ local types_map = setmetatable({
         elseif k > 0xDF then
             return 'fixnum_neg'
         else
-            return 'reserved' .. k
+            return 'reserved' .. tostring(k)
         end
 end })
 m.types_map = types_map
@@ -741,7 +741,7 @@ end
 
 for k = 0, 4 do
     local n = 2^k
-    unpackers['fixext' .. n] = function (c)
+    unpackers['fixext' .. tostring(n)] = function (c)
         local s, i, j = c.s, c.i, c.j
         if i > j then
             c:underflow(i)
