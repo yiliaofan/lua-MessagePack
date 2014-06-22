@@ -27,8 +27,9 @@ local tostring = tostring
 local type = type
 local char = require'string'.char
 local floor = require'math'.floor
-local frexp = require'math'.frexp
-local ldexp = require'math'.ldexp
+local ifloor = require'math'.ifloor or floor
+local frexp = require'math'.frexp or require'mathx'.frexp
+local ldexp = require'math'.ldexp or require'mathx'.ldexp
 local huge = require'math'.huge
 local tconcat = require'table'.concat
 
@@ -481,7 +482,7 @@ end
 m.set_number = set_number
 
 for k = 0, 4 do
-    local n = 2^k
+    local n = ifloor(2^k)
     local fixext = 0xD4 + k
     packers['fixext' .. tostring(n)] = function (buffer, tag, data)
         assert(#data == n, "bad length for fixext" .. tostring(n))
@@ -927,7 +928,7 @@ function m.build_ext (tag, data)
 end
 
 for k = 0, 4 do
-    local n = 2^k
+    local n = ifloor(2^k)
     unpackers['fixext' .. tostring(n)] = function (c)
         local s, i, j = c.s, c.i, c.j
         if i > j then
