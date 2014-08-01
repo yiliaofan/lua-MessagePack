@@ -16,7 +16,7 @@ local tostring = tostring
 local type = type
 local char = require'string'.char
 local math_type = require'math'.type
-local ifloor = require'math'.ifloor
+local tointeger = require'math'.tointeger
 local tconcat = require'table'.concat
 local dumpfloat = require'string'.dumpfloat
 local dumpint = require'string'.dumpint
@@ -346,7 +346,7 @@ end
 m.set_number = set_number
 
 for k = 0, 4 do
-    local n = ifloor(2^k)
+    local n = tointeger(2^k)
     local fixext = 0xD4 + k
     packers['fixext' .. tostring(n)] = function (buffer, tag, data)
         assert(#data == n, "bad length for fixext" .. tostring(n))
@@ -738,7 +738,7 @@ function m.build_ext (tag, data)
 end
 
 for k = 0, 4 do
-    local n = ifloor(2^k)
+    local n = tointeger(2^k)
     unpackers['fixext' .. tostring(n)] = function (c)
         local s, i, j = c.s, c.i, c.j
         if i > j then
