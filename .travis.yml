@@ -21,10 +21,12 @@ install:
   - sudo make install
   - cd ..
   - sudo luarocks install lua-testmore
+  - sudo luarocks install lbc
+  - sudo luarocks install luacov-coveralls
 
 # Build and test.
 script:
-  - make LUA=lua$LUASUFFIX test
+  - make LUA=lua$LUASUFFIX coveralls
 
 branches:
   only:
