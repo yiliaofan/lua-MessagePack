@@ -1,7 +1,10 @@
 MessagePack for Lua (spec v5)
 =============================
 
-[![Build Status](https://travis-ci.org/fperrad/lua-MessagePack.png)](https://travis-ci.org/fperrad/lua-MessagePack)
+[![Build Status](https://travis-ci.org/fperrad/lua-MessagePack.png?branch=master)](https://travis-ci.org/fperrad/lua-MessagePack)
+[![Coverage Status](https://coveralls.io/repos/fperrad/lua-MessagePack/badge.png?branch=master)](https://coveralls.io/r/fperrad/lua-MessagePack?branch=master)
+[![Licence](http://img.shields.io/badge/Licence-MIT-brightgreen.svg)](COPYRIGHT)
+[![Dependencies](http://img.shields.io/badge/Dependencies-none-brightgreen.svg)](COPYRIGHT)
 
 ``` lua
 local mp = require 'MessagePack'
