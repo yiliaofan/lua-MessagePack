@@ -98,7 +98,7 @@ coverage:
 coveralls:
 	rm -f src/luacov.stats.out src/luacov.report.out
 	cd $(SRC) && prove --exec="$(LUA) -lluacov" ../test/*.t
-	cd $(SRC) && luacov-coveralls -e ^/usr
+	cd $(SRC) && luacov-coveralls -e ^/usr -e %.t$
 
 README.html: README.md
 	Markdown.pl README.md > README.html
