@@ -2,11 +2,14 @@
 
 require 'Test.More'
 
-plan(36)
+plan(40)
 
 local mp = require 'MessagePack'
 
 mp.set_number'float'
+local nan = mp.unpack(mp.pack(0/0))
+type_ok( nan, 'number', "nan" )
+ok( nan ~= nan )
 is( mp.unpack(mp.pack(3.140625)), 3.140625, "3.140625" )
 mp.set_number'double'
 is( mp.unpack(mp.pack(math.pi)), math.pi, "pi" )
@@ -73,11 +76,15 @@ t = { string.rep('x', 2^3):byte(1, -1) }
 is_deeply( mp.unpack(mp.pack(t)), t, "#t 2^3" )
 t = { string.rep('x', 2^9):byte(1, -1) }
 is_deeply( mp.unpack(mp.pack(t)), t, "#t 2^9" )
+while #t < 2^17 do t[#t+1] = 'x' end
+is_deeply( mp.unpack(mp.pack(t)), t, "#t 2^17" )
 
 h = {}
-for i = 1, 2^3 do h[10*i] = i end
+for i = 1, 2^3 do h[10*i] = 'x' end
 is_deeply( mp.unpack(mp.pack(h)), h, "#h 2^3" )
 h = {}
-for i = 1, 2^9 do h[10*i] = i end
+for i = 1, 2^9 do h[10*i] = 'x' end
 is_deeply( mp.unpack(mp.pack(h)), h, "#h 2^9" )
+for i = 1, 2^17 do h[10*i] = 'x' end
+is_deeply( mp.unpack(mp.pack(h)), h, "#h 2^17" )
 
