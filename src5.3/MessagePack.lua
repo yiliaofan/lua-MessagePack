@@ -18,10 +18,8 @@ local char = require'string'.char
 local math_type = require'math'.type
 local tointeger = require'math'.tointeger
 local tconcat = require'table'.concat
-local dumpfloat = require'string'.dumpfloat
-local dumpint = require'string'.dumpint
-local undumpfloat = require'string'.undumpfloat
-local undumpint = require 'string'.undumpint
+local pack = require'string'.pack
+local unpack = require'string'.unpack
 
 --[[ debug only
 local format = require'string'.format
@@ -75,10 +73,10 @@ packers['string_compat'] = function (buffer, str)
         buffer[#buffer+1] = char(0xA0 + n)      -- fixstr
     elseif n <= 0xFFFF then
         buffer[#buffer+1] = char(0xDA)          -- str16
-        buffer[#buffer+1] = dumpint(n, 2, 'b')
+        buffer[#buffer+1] = pack('>I2', n)
     elseif n <= 0xFFFFFFFF then
         buffer[#buffer+1] = char(0xDB)          -- str32
-        buffer[#buffer+1] = dumpint(n, 4, 'b')
+        buffer[#buffer+1] = pack('>I4', n)
     else
         error"overflow in pack 'string_compat'"
     end
@@ -94,10 +92,10 @@ packers['_string'] = function (buffer, str)
                                  n)
     elseif n <= 0xFFFF then
         buffer[#buffer+1] = char(0xDA)          -- str16
-        buffer[#buffer+1] = dumpint(n, 2, 'b')
+        buffer[#buffer+1] = pack('>I2', n)
     elseif n <= 0xFFFFFFFF then
         buffer[#buffer+1] = char(0xDB)          -- str32
-        buffer[#buffer+1] = dumpint(n, 4, 'b')
+        buffer[#buffer+1] = pack('>I4', n)
     else
         error"overflow in pack 'string'"
     end
@@ -111,10 +109,10 @@ packers['binary'] = function (buffer, str)
                                  n)
     elseif n <= 0xFFFF then
         buffer[#buffer+1] = char(0xC5)          -- bin16
-        buffer[#buffer+1] = dumpint(n, 2, 'b')
+        buffer[#buffer+1] = pack('>I2', n)
     elseif n <= 0xFFFFFFFF then
         buffer[#buffer+1] = char(0xC6)          -- bin32
-        buffer[#buffer+1] = dumpint(n, 4, 'b')
+        buffer[#buffer+1] = pack('>I4', n)
     else
         error"overflow in pack 'binary'"
     end
@@ -139,10 +137,10 @@ packers['map'] = function (buffer, tbl, n)
         buffer[#buffer+1] = char(0x80 + n)      -- fixmap
     elseif n <= 0xFFFF then
         buffer[#buffer+1] = char(0xDE)          -- map16
-        buffer[#buffer+1] = dumpint(n, 2, 'b')
+        buffer[#buffer+1] = pack('>I2', n)
     elseif n <= 0xFFFFFFFF then
         buffer[#buffer+1] = char(0xDF)          -- map32
-        buffer[#buffer+1] = dumpint(n, 4, 'b')
+        buffer[#buffer+1] = pack('>I4', n)
     else
         error"overflow in pack 'map'"
     end
@@ -157,10 +155,10 @@ packers['array'] = function (buffer, tbl, n)
         buffer[#buffer+1] = char(0x90 + n)      -- fixarray
     elseif n <= 0xFFFF then
         buffer[#buffer+1] = char(0xDC)          -- array16
-        buffer[#buffer+1] = dumpint(n, 2, 'b')
+        buffer[#buffer+1] = pack('>I2', n)
     elseif n <= 0xFFFFFFFF then
         buffer[#buffer+1] = char(0xDD)          -- array32
-        buffer[#buffer+1] = dumpint(n, 4, 'b')
+        buffer[#buffer+1] = pack('>I4', n)
     else
         error"overflow in pack 'array'"
     end
@@ -239,29 +237,29 @@ packers['unsigned'] = function (buffer, n)
                                      n)
         elseif n <= 0xFFFF then
             buffer[#buffer+1] = char(0xCD)      -- uint16
-            buffer[#buffer+1] = dumpint(n, 2, 'b')
+            buffer[#buffer+1] = pack('>I2', n)
         elseif n <= 0xFFFFFFFF then
             buffer[#buffer+1] = char(0xCE)      -- uint32
-            buffer[#buffer+1] = dumpint(n, 4, 'b')
+            buffer[#buffer+1] = pack('>I4', n)
         else
             buffer[#buffer+1] = char(0xCF)      -- uint64
-            buffer[#buffer+1] = dumpint(n, 8, 'b')
+            buffer[#buffer+1] = pack('>I8', n)
         end
     else
         if n >= -0x20 then
             buffer[#buffer+1] = char(0x100 + n) -- fixnum_neg
         elseif n >= -0x80 then
             buffer[#buffer+1] = char(0xD0)      -- int8
-            buffer[#buffer+1] = dumpint(n, 1, 'b')
+            buffer[#buffer+1] = pack('>i1', n)
         elseif n >= -0x8000 then
             buffer[#buffer+1] = char(0xD1)      -- int16
-            buffer[#buffer+1] = dumpint(n, 2, 'b')
+            buffer[#buffer+1] = pack('>i2', n)
         elseif n >= -0x80000000 then
             buffer[#buffer+1] = char(0xD2)      -- int32
-            buffer[#buffer+1] = dumpint(n, 4, 'b')
+            buffer[#buffer+1] = pack('>i4', n)
         else
             buffer[#buffer+1] = char(0xD3)      -- int64
-            buffer[#buffer+1] = dumpint(n, 8, 'b')
+            buffer[#buffer+1] = pack('>i8', n)
         end
     end
 end
@@ -272,29 +270,29 @@ packers['signed'] = function (buffer, n)
             buffer[#buffer+1] = char(n)         -- fixnum_pos
         elseif n <= 0x7FFF then
             buffer[#buffer+1] = char(0xD1)      -- int16
-            buffer[#buffer+1] = dumpint(n, 2, 'b')
+            buffer[#buffer+1] = pack('>i2', n)
         elseif n <= 0x7FFFFFFF then
             buffer[#buffer+1] = char(0xD2)      -- int32
-            buffer[#buffer+1] = dumpint(n, 4, 'b')
+            buffer[#buffer+1] = pack('>i4', n)
         else
             buffer[#buffer+1] = char(0xD3)      -- int64
-            buffer[#buffer+1] = dumpint(n, 8, 'b')
+            buffer[#buffer+1] = pack('>i8', n)
         end
     else
         if n >= -0x20 then
             buffer[#buffer+1] = char(0xE0 + 0x20 + n)   -- fixnum_neg
         elseif n >= -0x80 then
             buffer[#buffer+1] = char(0xD0)      -- int8
-            buffer[#buffer+1] = dumpint(n, 1, 'b')
+            buffer[#buffer+1] = pack('>i1', n)
         elseif n >= -0x8000 then
             buffer[#buffer+1] = char(0xD1)      -- int16
-            buffer[#buffer+1] = dumpint(n, 2, 'b')
+            buffer[#buffer+1] = pack('>i2', n)
         elseif n >= -0x80000000 then
             buffer[#buffer+1] = char(0xD2)      -- int32
-            buffer[#buffer+1] = dumpint(n, 4, 'b')
+            buffer[#buffer+1] = pack('>i4', n)
         else
             buffer[#buffer+1] = char(0xD3)      -- int64
-            buffer[#buffer+1] = dumpint(n, 8, 'b')
+            buffer[#buffer+1] = pack('>i8', n)
         end
     end
 end
@@ -312,12 +310,12 @@ m.set_integer = set_integer
 
 packers['float'] = function (buffer, n)
     buffer[#buffer+1] = char(0xCA)
-    buffer[#buffer+1] = dumpfloat(n, 'f', 'b')
+    buffer[#buffer+1] = pack('>f', n)
 end
 
 packers['double'] = function (buffer, n)
     buffer[#buffer+1] = char(0xCB)
-    buffer[#buffer+1] = dumpfloat(n, 'd', 'b')
+    buffer[#buffer+1] = pack('>d', n)
 end
 
 local set_number = function (number)
@@ -351,7 +349,7 @@ for k = 0, 4 do
     packers['fixext' .. tostring(n)] = function (buffer, tag, data)
         assert(#data == n, "bad length for fixext" .. tostring(n))
         buffer[#buffer+1] = char(fixext)
-        buffer[#buffer+1] = dumpint(tag, 1, 'b')
+        buffer[#buffer+1] = pack('>i1', tag)
         buffer[#buffer+1] = data
     end
 end
@@ -361,15 +359,15 @@ packers['ext'] = function (buffer, tag, data)
     if n <= 0xFF then
         buffer[#buffer+1] = char(0xC7,          -- ext8
                                  n)
-        buffer[#buffer+1] = dumpint(tag, 1, 'b')
+        buffer[#buffer+1] = pack('>i1', tag)
     elseif n <= 0xFFFF then
         buffer[#buffer+1] = char(0xC8)          -- ext16
-        buffer[#buffer+1] = dumpint(n, 2, 'b')
-        buffer[#buffer+1] = dumpint(tag, 1, 'b')
+        buffer[#buffer+1] = pack('>I2', n)
+        buffer[#buffer+1] = pack('>i1', tag)
     elseif n <= 0xFFFFFFFF then
         buffer[#buffer+1] = char(0xC9)          -- ext32
-        buffer[#buffer+1] = dumpint(n, 4, 'b')
-        buffer[#buffer+1] = dumpint(tag, 1, 'b')
+        buffer[#buffer+1] = pack('>I4', n)
+        buffer[#buffer+1] = pack('>i1', tag)
     else
         error"overflow in pack 'ext'"
     end
@@ -439,24 +437,6 @@ local unpackers = setmetatable({}, {
 })
 m.unpackers = unpackers
 
-local function undump_uint8 (s, i)
-    return s:sub(i, i):byte()
-end
-
-local function undump_uint16 (s, i)
-    local v = undumpint(s, i, 2, 'b')
-    return v < 0 and v + 0x10000 or v
-end
-
-local function undump_uint32 (s, i)
-    local v = undumpint(s, i, 4, 'b')
-    return v < 0 and v + 0x100000000 or v
-end
-
-local function undump_uint64 (s, i)
-    return undumpint(s, i, 8, 'b')
-end
-
 local function unpack_array (c, n)
     local t = {}
     local decode = unpackers['any']
@@ -506,7 +486,7 @@ unpackers['float'] = function (c)
         s, i, j = c.s, c.i, c.j
     end
     c.i = i+4
-    return undumpfloat(s, i, 'f', 'b')
+    return unpack('>f', s, i)
 end
 
 unpackers['double'] = function (c)
@@ -516,7 +496,7 @@ unpackers['double'] = function (c)
         s, i, j = c.s, c.i, c.j
     end
     c.i = i+8
-    return undumpfloat(s, i, 'd', 'b')
+    return unpack('>d', s, i)
 end
 
 unpackers['fixnum_pos'] = function (c, val)
@@ -530,7 +510,7 @@ unpackers['uint8'] = function (c)
         s, i, j = c.s, c.i, c.j
     end
     c.i = i+1
-    return undump_uint8(s, i)
+    return unpack('>I1', s, i)
 end
 
 unpackers['uint16'] = function (c)
@@ -540,7 +520,7 @@ unpackers['uint16'] = function (c)
         s, i, j = c.s, c.i, c.j
     end
     c.i = i+2
-    return undump_uint16(s, i)
+    return unpack('>I2', s, i)
 end
 
 unpackers['uint32'] = function (c)
@@ -550,7 +530,7 @@ unpackers['uint32'] = function (c)
         s, i, j = c.s, c.i, c.j
     end
     c.i = i+4
-    return undump_uint32(s, i)
+    return unpack('>I4', s, i)
 end
 
 unpackers['uint64'] = function (c)
@@ -560,7 +540,7 @@ unpackers['uint64'] = function (c)
         s, i, j = c.s, c.i, c.j
     end
     c.i = i+8
-    return undump_uint64(s, i)
+    return unpack('>I8', s, i)
 end
 
 unpackers['fixnum_neg'] = function (c, val)
@@ -574,7 +554,7 @@ unpackers['int8'] = function (c)
         s, i, j = c.s, c.i, c.j
     end
     c.i = i+1
-    return undumpint(s, i, 1, 'b')
+    return unpack('>i1', s, i)
 end
 
 unpackers['int16'] = function (c)
@@ -584,7 +564,7 @@ unpackers['int16'] = function (c)
         s, i, j = c.s, c.i, c.j
     end
     c.i = i+2
-    return undumpint(s, i, 2, 'b')
+    return unpack('>i2', s, i)
 end
 
 unpackers['int32'] = function (c)
@@ -594,7 +574,7 @@ unpackers['int32'] = function (c)
         s, i, j = c.s, c.i, c.j
     end
     c.i = i+4
-    return undumpint(s, i, 4, 'b')
+    return unpack('>i4', s, i)
 end
 
 unpackers['int64'] = function (c)
@@ -604,7 +584,7 @@ unpackers['int64'] = function (c)
         s, i, j = c.s, c.i, c.j
     end
     c.i = i+8
-    return undumpint(s, i, 8, 'b')
+    return unpack('>i8', s, i)
 end
 
 unpackers['fixstr'] = function (c, val)
@@ -626,7 +606,7 @@ unpackers['str8'] = function (c)
         c:underflow(i)
         s, i, j = c.s, c.i, c.j
     end
-    local n = undump_uint8(s, i)
+    local n = unpack('>I1', s, i)
     i = i+1
     c.i = i
     local e = i+n-1
@@ -645,7 +625,7 @@ unpackers['str16'] = function (c)
         c:underflow(i+1)
         s, i, j = c.s, c.i, c.j
     end
-    local n = undump_uint16(s, i)
+    local n = unpack('>I2', s, i)
     i = i+2
     c.i = i
     local e = i+n-1
@@ -664,7 +644,7 @@ unpackers['str32'] = function (c)
         c:underflow(i+3)
         s, i, j = c.s, c.i, c.j
     end
-    local n = undump_uint32(s, i)
+    local n = unpack('>I4', s, i)
     i = i+4
     c.i = i
     local e = i+n-1
@@ -691,7 +671,7 @@ unpackers['array16'] = function (c)
         c:underflow(i+1)
         s, i, j = c.s, c.i, c.j
     end
-    local n = undump_uint16(s, i)
+    local n = unpack('>I2', s, i)
     c.i = i+2
     return unpack_array(c, n)
 end
@@ -702,7 +682,7 @@ unpackers['array32'] = function (c)
         c:underflow(i+3)
         s, i, j = c.s, c.i, c.j
     end
-    local n = undump_uint32(s, i)
+    local n = unpack('>I4', s, i)
     c.i = i+4
     return unpack_array(c, n)
 end
@@ -717,7 +697,7 @@ unpackers['map16'] = function (c)
         c:underflow(i+1)
         s, i, j = c.s, c.i, c.j
     end
-    local n = undump_uint16(s, i)
+    local n = unpack('>I2', s, i)
     c.i = i+2
     return unpack_map(c, n)
 end
@@ -728,7 +708,7 @@ unpackers['map32'] = function (c)
         c:underflow(i+3)
         s, i, j = c.s, c.i, c.j
     end
-    local n = undump_uint32(s, i)
+    local n = unpack('>I4', s, i)
     c.i = i+4
     return unpack_map(c, n)
 end
@@ -745,7 +725,7 @@ for k = 0, 4 do
             c:underflow(i)
             s, i, j = c.s, c.i, c.j
         end
-        local tag = undumpint(s, i, 1, 'b')
+        local tag = unpack('>i1', s, i)
         i = i+1
         c.i = i
         local e = i+n-1
@@ -765,14 +745,14 @@ unpackers['ext8'] = function (c)
         c:underflow(i)
         s, i, j = c.s, c.i, c.j
     end
-    local n = undump_uint8(s, i)
+    local n = unpack('>I1', s, i)
     i = i+1
     c.i = i
     if i > j then
         c:underflow(i)
         s, i, j = c.s, c.i, c.j
     end
-    local tag = undumpint(s, i, 1, 'b')
+    local tag = unpack('>i1', s, i)
     i = i+1
     c.i = i
     local e = i+n-1
@@ -791,14 +771,14 @@ unpackers['ext16'] = function (c)
         c:underflow(i+1)
         s, i, j = c.s, c.i, c.j
     end
-    local n = undump_uint16(s, i)
+    local n = unpack('>I2', s, i)
     i = i+2
     c.i = i
     if i > j then
         c:underflow(i)
         s, i, j = c.s, c.i, c.j
     end
-    local tag = undumpint(s, i, 1, 'b')
+    local tag = unpack('>i1', s, i)
     i = i+1
     c.i = i
     local e = i+n-1
@@ -817,14 +797,14 @@ unpackers['ext32'] = function (c)
         c:underflow(i+3)
         s, i, j = c.s, c.i, c.j
     end
-    local n = undump_uint32(s, i)
+    local n = unpack('>I4', s, i)
     i = i+4
     c.i = i
     if i > j then
         c:underflow(i)
         s, i, j = c.s, c.i, c.j
     end
-    local tag = undumpint(s, i, 1, 'b')
+    local tag = unpack('>i1', s, i)
     i = i+1
     c.i = i
     local e = i+n-1
