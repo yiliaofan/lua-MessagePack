@@ -10,12 +10,17 @@ end
 local SIZEOF_NUMBER = 8
 local NUMBER_INTEGRAL = false
 if not jit then
-    -- Lua 5.1 & 5.2
-    local loadstring = loadstring or load
-    local luac = string.dump(loadstring "a = 1")
-    local header = { luac:sub(1, 12):byte(1, 12) }
-    SIZEOF_NUMBER = header[11]
-    NUMBER_INTEGRAL = 1 == header[12]
+    if _VERSION < 'Lua 5.3' then
+        -- Lua 5.1 & 5.2
+        local loadstring = loadstring or load
+        local luac = string.dump(loadstring "a = 1")
+        local header = { luac:sub(1, 12):byte(1, 12) }
+        SIZEOF_NUMBER = header[11]
+        NUMBER_INTEGRAL = 1 == header[12]
+    else
+        SIZEOF_NUMBER = #string.pack('n', 0.0)
+        NUMBER_INTEGRAL = math.type(0.0) == 'integer'
+    end
 end
 
 local assert = assert
@@ -1099,8 +1104,11 @@ end
 set_string'string_compat'
 set_integer'signed'
 if NUMBER_INTEGRAL then
+    packers['double'] = packers['integer']
+    packers['float'] = packers['integer']
     set_number'integer'
 elseif SIZEOF_NUMBER == 4 then
+    packers['double'] = packers['float']
     m.small_lua = true
     set_number'float'
 else
