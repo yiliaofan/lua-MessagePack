@@ -884,6 +884,7 @@ set_integer'signed'
 if math_type(0.0) == 'integer' then
     set_number'integer'
 elseif #pack('n', 0.0) == 4 then
+    m.small_lua = true
     set_number'float'
 else
     m.full64bits = true

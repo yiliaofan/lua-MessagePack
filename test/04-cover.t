@@ -21,8 +21,12 @@ is( mp.unpack(mp.pack(2^11)), 2^11, "2^11" )
 is( mp.unpack(mp.pack(-2^11)), -2^11, "-2^11" )
 is( mp.unpack(mp.pack(2^21)), 2^21, "2^21" )
 is( mp.unpack(mp.pack(-2^21)), -2^21, "-2^21" )
-is( mp.unpack(mp.pack(2^51)), 2^51, "2^51" )
-is( mp.unpack(mp.pack(-2^51)), -2^51, "-2^51" )
+if mp.small_lua then
+    skip("Small Lua (32 bits)", 2)
+else
+    is( mp.unpack(mp.pack(2^51)), 2^51, "2^51" )
+    is( mp.unpack(mp.pack(-2^51)), -2^51, "-2^51" )
+end
 if mp.full64bits then
     is( mp.unpack(mp.pack(2^61)), 2^61, "2^61" )
     is( mp.unpack(mp.pack(-2^61)), -2^61, "-2^61" )
@@ -37,8 +41,12 @@ is( mp.unpack(mp.pack(2^11)), 2^11, "2^11" )
 is( mp.unpack(mp.pack(-2^11)), -2^11, "-2^11" )
 is( mp.unpack(mp.pack(2^21)), 2^21, "2^21" )
 is( mp.unpack(mp.pack(-2^21)), -2^21, "-2^21" )
-is( mp.unpack(mp.pack(2^51)), 2^51, "2^51" )
-is( mp.unpack(mp.pack(-2^51)), -2^51, "-2^51" )
+if mp.small_lua then
+    skip("Small Lua (32 bits)", 2)
+else
+    is( mp.unpack(mp.pack(2^51)), 2^51, "2^51" )
+    is( mp.unpack(mp.pack(-2^51)), -2^51, "-2^51" )
+end
 if mp.full64bits then
     is( mp.unpack(mp.pack(2^61)), 2^61, "2^61" )
     is( mp.unpack(mp.pack(-2^61)), -2^61, "-2^61" )

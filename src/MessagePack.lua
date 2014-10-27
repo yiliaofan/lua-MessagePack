@@ -1101,6 +1101,7 @@ set_integer'signed'
 if NUMBER_INTEGRAL then
     set_number'integer'
 elseif SIZEOF_NUMBER == 4 then
+    m.small_lua = true
     set_number'float'
 else
     set_number'double'
