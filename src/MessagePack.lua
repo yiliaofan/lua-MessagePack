@@ -92,7 +92,7 @@ packers['string_compat'] = function (buffer, str)
         buffer[#buffer+1] = char(0xDA,          -- str16
                                  floor(n / 0x100),
                                  n % 0x100)
-    elseif n <= 0xFFFFFFFF then
+    elseif n <= 4294967295.0 then
         buffer[#buffer+1] = char(0xDB,          -- str32
                                  floor(n / 0x1000000),
                                  floor(n / 0x10000) % 0x100,
@@ -115,7 +115,7 @@ packers['_string'] = function (buffer, str)
         buffer[#buffer+1] = char(0xDA,          -- str16
                                  floor(n / 0x100),
                                  n % 0x100)
-    elseif n <= 0xFFFFFFFF then
+    elseif n <= 4294967295.0 then
         buffer[#buffer+1] = char(0xDB,          -- str32
                                  floor(n / 0x1000000),
                                  floor(n / 0x10000) % 0x100,
@@ -136,7 +136,7 @@ packers['binary'] = function (buffer, str)
         buffer[#buffer+1] = char(0xC5,          -- bin16
                                  floor(n / 0x100),
                                  n % 0x100)
-    elseif n <= 0xFFFFFFFF then
+    elseif n <= 4294967295.0 then
         buffer[#buffer+1] = char(0xC6,          -- bin32
                                  floor(n / 0x1000000),
                                  floor(n / 0x10000) % 0x100,
@@ -168,7 +168,7 @@ packers['map'] = function (buffer, tbl, n)
         buffer[#buffer+1] = char(0xDE,          -- map16
                                  floor(n / 0x100),
                                  n % 0x100)
-    elseif n <= 0xFFFFFFFF then
+    elseif n <= 4294967295.0 then
         buffer[#buffer+1] = char(0xDF,          -- map32
                                  floor(n / 0x1000000),
                                  floor(n / 0x10000) % 0x100,
@@ -190,7 +190,7 @@ packers['array'] = function (buffer, tbl, n)
         buffer[#buffer+1] = char(0xDC,          -- array16
                                  floor(n / 0x100),
                                  n % 0x100)
-    elseif n <= 0xFFFFFFFF then
+    elseif n <= 4294967295.0 then
         buffer[#buffer+1] = char(0xDD,          -- array32
                                  floor(n / 0x1000000),
                                  floor(n / 0x10000) % 0x100,
@@ -276,7 +276,7 @@ packers['unsigned'] = function (buffer, n)
             buffer[#buffer+1] = char(0xCD,      -- uint16
                                      floor(n / 0x100),
                                      n % 0x100)
-        elseif n <= 0xFFFFFFFF then
+        elseif n <= 4294967295.0 then
             buffer[#buffer+1] = char(0xCE,      -- uint32
                                      floor(n / 0x1000000),
                                      floor(n / 0x10000) % 0x100,
@@ -305,7 +305,7 @@ packers['unsigned'] = function (buffer, n)
                                      floor(n / 0x100),
                                      n % 0x100)
         elseif n >= -0x80000000 then
-            n = 0x100000000 + n
+            n = 4294967296.0 + n
             buffer[#buffer+1] = char(0xD2,      -- int32
                                      floor(n / 0x1000000),
                                      floor(n / 0x10000) % 0x100,
@@ -362,7 +362,7 @@ packers['signed'] = function (buffer, n)
                                      floor(n / 0x100),
                                      n % 0x100)
         elseif n >= -0x80000000 then
-            n = 0x100000000 + n
+            n = 4294967296.0 + n
             buffer[#buffer+1] = char(0xD2,      -- int32
                                      floor(n / 0x1000000),
                                      floor(n / 0x10000) % 0x100,
@@ -508,7 +508,7 @@ packers['ext'] = function (buffer, tag, data)
                                  floor(n / 0x100),
                                  n % 0x100,
                                  tag < 0 and tag + 0x100 or tag)
-    elseif n <= 0xFFFFFFFF then
+    elseif n <= 4294967295.0 then
         buffer[#buffer+1] = char(0xC9,          -- ext&32
                                  floor(n / 0x1000000),
                                  floor(n / 0x10000) % 0x100,
@@ -682,7 +682,7 @@ unpackers['double'] = function (c)
             n = 0.0/0.0
         end
     else
-        n = sign * ldexp(1.0 + mant / 0x10000000000000, expo - 0x3FF)
+        n = sign * ldexp(1.0 + mant / 4503599627370496.0, expo - 0x3FF)
     end
     c.i = i+8
     return n
