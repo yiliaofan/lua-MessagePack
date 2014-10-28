@@ -7,20 +7,15 @@ if not r then
     jit = nil
 end
 
-local SIZEOF_NUMBER = 8
-local NUMBER_INTEGRAL = false
-if not jit then
-    if _VERSION < 'Lua 5.3' then
-        -- Lua 5.1 & 5.2
-        local loadstring = loadstring or load
-        local luac = string.dump(loadstring "a = 1")
-        local header = { luac:sub(1, 12):byte(1, 12) }
-        SIZEOF_NUMBER = header[11]
-        NUMBER_INTEGRAL = 1 == header[12]
-    else
-        SIZEOF_NUMBER = #string.pack('n', 0.0)
-        NUMBER_INTEGRAL = math.type(0.0) == 'integer'
-    end
+local SIZEOF_NUMBER = string.pack and #string.pack('n', 0.0) or 8
+local NUMBER_INTEGRAL = math.type and (math.type(0.0) == math.type(0)) or false
+if not jit and _VERSION < 'Lua 5.3' then
+    -- Lua 5.1 & 5.2
+    local loadstring = loadstring or load
+    local luac = string.dump(loadstring "a = 1")
+    local header = { luac:sub(1, 12):byte(1, 12) }
+    SIZEOF_NUMBER = header[11]
+    NUMBER_INTEGRAL = 1 == header[12]
 end
 
 local assert = assert

@@ -881,7 +881,7 @@ end
 
 set_string'string_compat'
 set_integer'signed'
-if math_type(0.0) == 'integer' then
+if math_type(0.0) == math_type(0) then
     set_number'integer'
 elseif #pack('n', 0.0) == 4 then
     m.small_lua = true
