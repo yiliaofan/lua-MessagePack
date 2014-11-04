@@ -84,6 +84,11 @@ dist: $(TARBALL)
 
 rockspec: $(TARBALL)
 	perl -e '$(rockspec_pl)' rockspec.in > rockspec/lua-messagepack-$(VERSION)-$(REV).rockspec
+	perl -e '$(rockspec_pl)' rockspec.lua53.in > rockspec/lua-messagepack-lua53-$(VERSION)-$(REV).rockspec
+
+rock:
+	luarocks pack rockspec/lua-messagepack-$(VERSION)-$(REV).rockspec
+	luarocks pack rockspec/lua-messagepack-lua53-$(VERSION)-$(REV).rockspec
 
 check: test
 
