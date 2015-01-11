@@ -49,7 +49,7 @@ function ltn12.source.file (handle)
     end
 end
 
-local f = io.open('data.mpac', 'r')
+f = io.open('data.mpac', 'r')
 local s = ltn12.source.file(f)
 local i = 1
 for _, val in mp.unpacker(s) do

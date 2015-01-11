@@ -55,7 +55,7 @@ else
 end
 
 mp.set_string'string'
-s = string.rep('x', 2^3)
+local s = string.rep('x', 2^3)
 is( mp.unpack(mp.pack(s)), s, "#s 2^3" )        -- fixstr
 s = string.rep('x', 2^7)
 is( mp.unpack(mp.pack(s)), s, "#s 2^7" )        -- str 8
@@ -80,14 +80,14 @@ is( mp.unpack(mp.pack(s)), s, "#s 2^11" )       -- bin 16
 s = string.rep('x', 2^19)
 is( mp.unpack(mp.pack(s)), s, "#s 2^19" )       -- bin 32
 
-t = { string.rep('x', 2^3):byte(1, -1) }
+local t = { string.rep('x', 2^3):byte(1, -1) }
 is_deeply( mp.unpack(mp.pack(t)), t, "#t 2^3" )
 t = { string.rep('x', 2^9):byte(1, -1) }
 is_deeply( mp.unpack(mp.pack(t)), t, "#t 2^9" )
 while #t < 2^17 do t[#t+1] = 'x' end
 is_deeply( mp.unpack(mp.pack(t)), t, "#t 2^17" )
 
-h = {}
+local h = {}
 for i = 1, 2^3 do h[10*i] = 'x' end
 is_deeply( mp.unpack(mp.pack(h)), h, "#h 2^3" )
 h = {}

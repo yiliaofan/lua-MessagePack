@@ -48,20 +48,20 @@ function method:draw ()
     return "drawing " .. self._CLASS .. tostring(self)
 end
 
-a = Point{x = 1, y = 2}
+local a = Point{x = 1, y = 2}
 ok( a:isa 'Point' )
 is( a:draw(), "drawing Point(1, 2)" )
 
-b = mp.unpack(mp.pack(a))
+local b = mp.unpack(mp.pack(a))
 ok( b:isa 'Point' )
 is( b:draw(), "drawing Point(1, 2)" )
 
 a.desc = string.rep('x', 2^9)
-c = mp.unpack(mp.pack(a))
+local c = mp.unpack(mp.pack(a))
 ok( c:isa 'Point' )
 is( #c.desc, 2^9 )
 
 a.desc = string.rep('x', 2^17)
-d = mp.unpack(mp.pack(a))
+local d = mp.unpack(mp.pack(a))
 ok( d:isa 'Point' )
 is( #d.desc, 2^17 )

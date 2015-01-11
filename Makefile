@@ -98,6 +98,7 @@ test:
 luacheck:
 	luacheck --std=max --no-unused-args src --ignore j
 	luacheck --std=max --no-unused-args src5.3 --ignore j
+	luacheck --std=max --config .test.luacheckrc test/*.t
 
 coverage:
 	rm -f src/luacov.stats.out src/luacov.report.out
