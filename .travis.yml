@@ -24,9 +24,11 @@ install:
   - sudo luarocks install lua-coat
   - sudo luarocks install lbc
   - sudo luarocks install luacov-coveralls
+  - sudo luarocks install luacheck
 
 # Build and test.
 script:
+  - make luacheck
   - make LUA=lua$LUASUFFIX coveralls
 
 branches:
