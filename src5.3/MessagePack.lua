@@ -1,5 +1,5 @@
 --
--- lua-MessagePack : <http://fperrad.github.com/lua-MessagePack/>
+-- lua-MessagePack : <http://fperrad.github.io/lua-MessagePack/>
 --
 
 local assert = assert
