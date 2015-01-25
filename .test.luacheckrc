@@ -1,4 +1,4 @@
-globals = {
+read_globals = {
     -- Test.More
     'plan',
     'done_testing',
@@ -27,6 +27,10 @@ globals = {
     'todo_skip',
     'skip_rest',
     'todo',
+    -- testsuite
+    'Point',
+}
+globals = {
     -- Coat
     'argerror',
     'checktype',
@@ -55,6 +59,4 @@ globals = {
     'singleton',
     'abstract',
     'augment',
-    -- testsuite
-    'Point',
 }
