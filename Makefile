@@ -96,8 +96,8 @@ test:
 	cd $(SRC) && prove --exec=$(LUA) ../test/*.t
 
 luacheck:
-	luacheck --std=max --codes src --ignore 212 --ignore 213 --ignore 311/j
-	luacheck --std=max --codes src5.3 --ignore 212 --ignore 213 --ignore 311/j
+	luacheck --std=max --codes src --ignore 211/_ENV 212 213 311/j
+	luacheck --std=max --codes src5.3 --ignore 211/_ENV 212 213 311/j
 	luacheck --std=max --config .test.luacheckrc test/*.t
 
 coverage:
