@@ -1097,7 +1097,7 @@ function m.unpacker (src)
 end
 
 set_string'string_compat'
-set_integer'signed'
+set_integer'unsigned'
 if NUMBER_INTEGRAL then
     packers['double'] = packers['integer']
     packers['float'] = packers['integer']

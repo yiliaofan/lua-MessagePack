@@ -2,6 +2,8 @@ Revision history for lua-MessagePack
 
 0.3.3
 	shadow _ENV (see PR #12)
+	unsigned packer becomes the default for integer (see issue #13)
+	set_integer marked as deprecated
 
 0.3.2  Wed Jan 14 20:30:00 2015
 	add variant for Lua 5.3
